@@ -63,5 +63,5 @@ jobs:
         with:
           app-name: 'constoso-dentistry-webappdq'
           slot-name: 'Production'
-          package: starter/ContosoDentistryChatBot
+          package: .
           
