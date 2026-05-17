@@ -3,7 +3,7 @@
 
 const { ActivityHandler, MessageFactory } = require('botbuilder');
 
-const { QnAMaker, LuisRecognizer } = require('botbuilder-ai');
+const { LuisRecognizer } = require('botbuilder-ai');
 const DentistScheduler = require('./dentistscheduler');
 const IntentRecognizer = require("./intentrecognizer")
 
@@ -14,7 +14,7 @@ class DentaBot extends ActivityHandler {
         if (!configuration) throw new Error('[QnaMakerBot]: Missing parameter. configuration is required');
 
         // create a QnAMaker connector
-        this.QnAMaker = new QnAMaker(configuration.QnAConfiguration, qnaOptions);
+        this.QnAConfiguration = configuration.QnAConfiguration;
 
         // create a DentistScheduler connector
         this.DentistScheduler = new DentistScheduler(configuration.SchedulerConfiguration);
@@ -24,9 +24,14 @@ class DentaBot extends ActivityHandler {
 
 
         this.onMessage(async (context, next) => {
-            const qnaResults = await this.QnAMaker.getAnswers(context);
-            const luisResults = await this.IntentRecognizer.executeLuisQuery(context);
-                     
+            const qnaResults = await this.getQnAAnswers(context.activity.text);
+            let luisResults;
+            try {
+                luisResults = await this.IntentRecognizer.executeLuisQuery(context);
+            } catch (error) {
+                console.log('LUIS error, falling back to QnA:', error.message);
+                luisResults = { intents: { None: { score: 1 } }, entities: {} };
+}                
             // determine which service to respond with based on the results from LUIS //
 
             const topIntent = LuisRecognizer.topIntent(luisResults);
@@ -43,15 +48,16 @@ class DentaBot extends ActivityHandler {
                 await next();
                 return;
             } else {
-                if (qnaResults[0]) {
+                if (qnaResults[0] && qnaResults[0].confidenceScore > 0.5) {
                     await context.sendActivity(MessageFactory.text(qnaResults[0].answer, qnaResults[0].answer));
                 } else {
                     await context.sendActivity(MessageFactory.text("I'm sorry, I didn't understand that. Please try asking about availability or scheduling an appointment."));
                 }
                 await next();
+                
             }
 
-             
+    
             
     });
 
@@ -68,6 +74,25 @@ class DentaBot extends ActivityHandler {
         await next();
     });
     }
+    async getQnAAnswers(question) {
+    const url = `${this.QnAConfiguration.host}/language/:query-knowledgebases?projectName=${this.QnAConfiguration.knowledgeBaseId}&api-version=2021-10-01&deploymentName=production`;
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Ocp-Apim-Subscription-Key': this.QnAConfiguration.endpointKey
+        },
+        body: JSON.stringify({
+            top: 3,
+            question: question,
+            includeUnstructuredSources: true,
+            confidenceScoreThreshold: 0.5
+        })
+    });
+    const data = await response.json();
+    console.log('QnA API Response:', JSON.stringify(data));
+    return data.answers || [];
+}
 }
 
 module.exports.DentaBot = DentaBot;
