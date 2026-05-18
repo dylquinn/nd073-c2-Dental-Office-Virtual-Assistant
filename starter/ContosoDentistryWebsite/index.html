@@ -53,10 +53,20 @@
 			<div class="row aln-center">
 				<div class="col-6 col-6-medium col-12-small">
 					<section class="box style1">
-						<iframe
-							src='https://webchat.botframework.com/embed/botapplicationudacitydq'
-							style='min-width: 400px; width: 100%; min-height: 500px;'>
-						</iframe>
+						<div id="webchat" style="min-width: 400px; width: 100%; min-height: 500px;"></div>
+						<script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+						<script>
+						const p1 = '9cBu09vxIKO43vfVT6NxA9qk4zDIDDAq4PSIgFp7YtVHdZR0cIIKJQQJ99CEAC4f1cMAArohAAABAZBS3u0v.3fCUkcaG8uaORQI5McJ2VWXqPK2udwQXXZYqrcZ4';
+						const p2 = 'V2HTgSFtdE8oJQQJ99CEAC4f1cMAArohAAABAZBS2gta';
+						window.WebChat.renderWebChat(
+							{
+							directLine: window.WebChat.createDirectLine({
+								secret: p1 + p2
+							})
+							},
+							document.getElementById('webchat')
+						);
+						</script>
 					</section>
 				</div>
 			</div>
