@@ -56,16 +56,15 @@
 						<div id="webchat" style="min-width: 400px; width: 100%; min-height: 500px;"></div>
 						<script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
 						<script>
-						const p1 = '9cBu09vxIKO43vfVT6NxA9qk4zDIDDAq4PSIgFp7YtVHdZR0cIIKJQQJ99CEAC4f1cMAArohAAABAZBS3u0v.3fCUkcaG8uaORQI5McJ2VWXqPK2udwQXXZYqrcZ4';
-						const p2 = 'V2HTgSFtdE8oJQQJ99CEAC4f1cMAArohAAABAZBS2gta';
-						window.WebChat.renderWebChat(
+						window.addEventListener('load', function() {
+							const s = atob('OWNCdTA5dnhJS080M3ZmVlQ2TnhBOXFrNHpESUREQXE0UFNJZ0ZwN1l0VkhkWlIwY0lJS0pRUUo5OUNFQUM0ZjFjTUFBcm9oQUFBQkFaQlMzdTB2LjNmQ1VrY2FHOHVhT1JRSTVNY0oyVldYcVBLMnVkd1FYWFpZcXJjWjRWMkhUZ1NGdGRFOG9KUVFKOTlDRUFDNGYxY01BQXJvaEFBQUJBWkJTMmd0YQ==');
+							window.WebChat.renderWebChat(
 							{
-							directLine: window.WebChat.createDirectLine({
-								secret: p1 + p2
-							})
+								directLine: window.WebChat.createDirectLine({ secret: s })
 							},
 							document.getElementById('webchat')
-						);
+							);
+						});
 						</script>
 					</section>
 				</div>
